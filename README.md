@@ -214,7 +214,7 @@ aws_secret_access_key = insert-key-here
 aws_access_key_id = insert-id-here
 ```
 
-Create an `up.json` file in the parent directory. You might it easier to copy it from [`up.config`](./up.config)
+Create an `up.json` file in the parent directory. You might it easier to copy it from [`up.json`](./up.json)
 
 ```json
 {
@@ -252,7 +252,7 @@ Create an `up.json` file in the parent directory. You might it easier to copy it
 }
 ```
 
-`up` reads `.gitignore` first then `.upignore`. Given that you're using Typescript you don't want ./dist to be saved to Git but `up` needs to deploy it to AWS Lambda to run your Javascript server. So `up` can negate declared `.gitignore` folders/files by adding an exclamation point to dist.
+`up` reads `.gitignore` first then `.upignore`. Given that you're using Typescript you don't want ./dist to be saved to Git but `up` needs to deploy it to AWS Lambda to run your Javascript server. So `up` can negate declared `.gitignore` folders/files by adding an exclamation point to `dist`.
 
 Create a `.upignore` file with the following. 
 
