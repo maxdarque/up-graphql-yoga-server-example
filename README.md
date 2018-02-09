@@ -1,81 +1,274 @@
-<h1 align="center"><strong>Boilerplate for an Advanced GraphQL Server w/ TypeScript</strong></h1>
+<h1 align="center"><strong>How to run your graphql-yoga server on AWS Lambda with Apex Up</strong></h1>
 
 <br />
 
-<div align="center"><img src="https://imgur.com/1MfnLVl.png" /></div>
+Please feel free to make suggested improvements and raise issues. I am relatively new to Typescript and GraphQL.
 
-<div align="center"><strong>🚀 Bootstrap your GraphQL server within seconds</strong></div>
-<div align="center">Advanced starter kit for a flexible GraphQL server for TypeScript - based on best practices from the GraphQL community.</div>
+## What we will use
 
-## Features
+- [`graphql-cli`](https://github.com/graphql-cli/graphql-cli) - to initalize the project and download graphql-yoga and the boilerplate code.
+- [`graphql-yoga`](https://github.com/prisma/graphql-yoga) - based on Apollo Server & Express.
+- [`graphql-boilerplates/typescript-graphql-server`](https://github.com/graphql-boilerplates/typescript-graphql-server) - boilerplate code for the initial server.
+- [`graphcool/prisma`](https://github.com/graphcool/prisma) - to handle your database and much more
+- [`apex/up`](https://github.com/apex/up) - to deploy our app to AWS Lambda and manage everything from uploading node modules to S3, API Gateway, staging and logging.
+- [`Microsoft/TypeScript`](https://github.com/Microsoft/TypeScript) - to write the server code.
 
-- **Scalable GraphQL server:** The server uses [`graphql-yoga`](https://github.com/prisma/graphql-yoga) which is based on Apollo Server & Express
-- **Static type generation**: TypeScript types for GraphQL queries & mutations are generated in a build step
-- **Authentication**: Signup and login workflows are ready to use for your users
-- **GraphQL database:** Includes GraphQL database binding to [Prisma](https://www.prismagraphql.com) (running on MySQL)
-- **Tooling**: Out-of-the-box support for [GraphQL Playground](https://github.com/prisma/graphql-playground) & [query performance tracing](https://github.com/apollographql/apollo-tracing)
-- **Extensible**: Simple and flexible [data model](./database/datamodel.graphql) – easy to adjust and extend
-- **No configuration overhead**: Preconfigured [`graphql-config`](https://github.com/prisma/graphql-config) setup
-- **Realtime updates**: Support for GraphQL subscriptions (_coming soon_)
+If you're just starting out with graphql and graphql-yoga, you may find the following tutorial helpful
 
-Read more about the idea behind GraphQL boilerplates [here](https://blog.graph.cool/graphql-boilerplates-graphql-create-how-to-setup-a-graphql-project-6428be2f3a5).
+https://www.howtographql.com/graphql-js/0-introduction/
 
-## Requirements
+## Let's get started
 
-You need to have the [GraphQL CLI](https://github.com/graphql-cli/graphql-cli) installed to bootstrap your GraphQL server using `graphql create`:
+Install [GraphQL CLI](https://github.com/graphql-cli/graphql-cli) to bootstrap your GraphQL server:
 
 ```sh
 npm install -g graphql-cli
 ```
 
-## Getting started
+Use graphql-cli to create your project:
 
 ```sh
-# 1. Bootstrap GraphQL server in directory `my-app`, based on `typescript-advanced` boilerplate
-graphql create my-app --boilerplate typescript-advanced
+graphql create up-graphql-yoga-server-example --boilerplate typescript-advanced
+```
 
-# 2. When prompted, deploy the Prisma service to a _public cluster_
+As it creates the boilerplate project, it will ask you to choose where you'd like to deploy prisma. Select either prisma-eu1 or prisma-us1. In my case I chose, prisma-eu1 which is hosted in **eu-west-1**. This means I deployed my server to the same AWS region.
 
-# 3. Navigate to the new project
-cd my-app
+Navigate to the new project and check if the server starts
+```sh
+cd up-graphql-yoga-server-example
 
-# 4. Start server (runs on http://localhost:4000) and open GraphQL Playground
+# This will start the server on http://localhost:4000 and open GraphQL Playground in your browser.
 yarn dev
 ```
 
-![](https://imgur.com/hElq68i.png)
+You will need to compile your Typescript into Javascript so it can run on AWS Lambda. Edit your tsconfig.json file to look lke this because AWS Lambda only supports Node.js v4.3.2 and 6.10.3 as of now (see [`currently supported runtimes`](https://docs.aws.amazon.com/lambda/latest/dg/current-supported-versions.html):
 
-## Documentation
+```json
+{
+  "compilerOptions": {
+    "target": "es6",
+    "lib": [ "es6", "dom", "esnext.asynciterable" ],
+    "moduleResolution": "node",
+    "module": "commonjs",
+    "sourceMap": true,
+    "rootDir": "src",
+    "outDir": "dist"
+  }
+}
+```
 
-### Commands
+**Apex Up** references package.json and the `build` and `start` commands. So you will need to edit the script section of your package.json file so that `start` runs the compiled Javascript code.
 
-* `yarn start` starts GraphQL server on `http://localhost:4000`
-* `yarn dev` starts GraphQL server on `http://localhost:4000` _and_ opens GraphQL Playground
-* `yarn playground` opens the GraphQL Playground for the `projects` from [`.graphqlconfig.yml`](./.graphqlconfig.yml)
-* `yarn prisma <subcommand>` gives access to local version of Prisma CLI (e.g. `yarn prisma deploy`)
+```json
+"scripts": {
+  "local-start": "dotenv -- nodemon -e ts,graphql -x ts-node src/index.ts",
+  "dev": "npm-run-all --parallel local-start playground",
+  "debug": "dotenv -- nodemon -e ts,graphql -x ts-node --inspect src/index.ts",
+  "playground": "graphql playground --port 5000",
+  "build": "rimraf dist && tsc",
+  "start": "node dist/index.js",
+  "local-start-js": "dotenv -- node dist/index.js"
+},
+```
 
-> **Note**: We recommend that you're using `yarn dev` during development as it will give you access to the GraphQL API or your server (defined by the [application schema](./src/schema.graphql)) as well as to the Prisma API directly (defined by the [Prisma database schema](./generated/prisma.graphql)). If you're starting the server with `yarn start`, you'll only be able to access the API of the application schema.
+## Installing and using Apex Up
 
-### Project structure
+Many of you will find the [`Apex Up`](https://up.docs.apex.sh/) documentation helpful and well written.
 
-![](https://imgur.com/95faUsa.png)
+Install up
 
-| File name 　　　　　　　　　　　　　　| Description 　　　　　　　　<br><br>|
-| :--  | :--         |
-| `├── .env` | Defines environment variables |
-| `├── .graphqlconfig.yml` | Configuration file based on [`graphql-config`](https://github.com/prisma/graphql-config) (e.g. used by GraphQL Playground).|
-| `└── database ` (_directory_) | _Contains all files that are related to the Prisma database service_ |\
-| `　　├── prisma.yml` | The root configuration file for your Prisma database service ([docs](https://www.prismagraphql.com/docs/reference/prisma.yml/overview-and-example-foatho8aip)) |
-| `　　└── datamodel.graphql` | Defines your data model (written in [GraphQL SDL](https://blog.graph.cool/graphql-sdl-schema-definition-language-6755bcb9ce51)) |
-| `└── src ` (_directory_) | _Contains the source files for your GraphQL server_ |
-| `　　├── index.ts` | The entry point for your GraphQL server |
-| `　　├── schema.graphql` | The **application schema** defining the API exposed to client applications  |
-| `　　└── generated` (_directory_) | _Contains generated files_ |
-| `　　　　├── prisma.ts` | The generated TypeScript bindings for the Prisma GraphQL API  |
-| `　　　　└── prisma.grapghql` | The **Prisma database schema** defining the Prisma GraphQL API  |
+```sh
+npm i -g up
+```
 
-## Contributing
+On AWS IAM, create a new policy as follows:
+```json
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Action": [
+        "route53:*",
+        "route53domains:*"
+      ],
+      "Effect": "Allow",
+      "Resource": "*"
+    },
+    {
+      "Action": [
+        "acm:*"
+      ],
+      "Effect": "Allow",
+      "Resource": "*"
+    },
+    {
+      "Action": [
+        "s3:*"
+      ],
+      "Effect": "Allow",
+      "Resource": "*"
+    },
+    {
+      "Action": [
+        "ssm:*"
+      ],
+      "Effect": "Allow",
+      "Resource": "*"
+    },
+    {
+      "Action": [
+        "cloudfront:*"
+      ],
+      "Effect": "Allow",
+      "Resource": "*"
+    },
+    {
+      "Action": [
+        "sns:*"
+      ],
+      "Effect": "Allow",
+      "Resource": "*"
+    },
+    {
+      "Action": [
+        "ssm:*"
+      ],
+      "Effect": "Allow",
+      "Resource": "*"
+    },
+    {
+      "Action": [
+        "cloudformation:Create*",
+        "cloudformation:Update*",
+        "cloudformation:Delete*",
+        "cloudformation:Describe*",
+        "cloudformation:ExecuteChangeSet"
+      ],
+      "Effect": "Allow",
+      "Resource": "*"
+    },
+    {
+      "Action": [
+        "iam:AttachRolePolicy",
+        "iam:CreatePolicy",
+        "iam:CreateRole",
+        "iam:DeleteRole",
+        "iam:DeleteRolePolicy",
+        "iam:GetRole",
+        "iam:PassRole",
+        "iam:PutRolePolicy"
+      ],
+      "Effect": "Allow",
+      "Resource": "*"
+    },
+    {
+      "Action": [
+        "lambda:Create*",
+        "lambda:Delete*",
+        "lambda:Get*",
+        "lambda:List*",
+        "lambda:Update*",
+        "lambda:AddPermission",
+        "lambda:RemovePermission",
+        "lambda:InvokeFunction"
+      ],
+      "Effect": "Allow",
+      "Resource": "*"
+    },
+    {
+      "Action": [
+        "logs:Create*",
+        "logs:Put*",
+        "logs:Test*",
+        "logs:Describe*",
+        "logs:FilterLogEvents"
+      ],
+      "Effect": "Allow",
+      "Resource": "*"
+    },
+    {
+      "Effect": "Allow",
+      "Action": [
+        "cloudwatch:*"
+      ],
+      "Resource": "*"
+    },
+    {
+      "Effect": "Allow",
+      "Action": [
+        "apigateway:*"
+      ],
+      "Resource": [
+        "arn:aws:apigateway:*::/*"
+      ]
+    }
+  ]
+}
+```
 
-The GraphQL boilerplates are maintained by the GraphQL community, with official support from the [Apollo](https://dev-blog.apollodata.com) & [Graphcool](https://blog.graph.cool/) teams.
+Create a new user on IAM with the newly created policy and save the keys to `~/.aws/credentials`
 
-Your feedback is **very helpful**, please share your opinion and thoughts! If you have any questions or want to contribute yourself, join the [`#graphql-boilerplate`](https://graphcool.slack.com/messages/graphql-boilerplate) channel on our [Slack](https://graphcool.slack.com/).
+```
+[name-of-newly-created-aws-profile]
+aws_secret_access_key = insert-key-here
+aws_access_key_id = insert-id-here
+```
+
+Create an `up.json` file in the parent directory
+
+```json
+{
+  "name": "name-of-server",
+  "profile": "name-of-newly-created-aws-profile", // references your AWS credentials
+  "regions": ["eu-west-1"], // the region you wish to deploy to. Typically the same as your prisma deployment
+  "lambda": {
+    "memory": 512 // how much memory you wish to allocate to lambda. For for details see Apex Up docs
+  },
+  "proxy": {
+    "command": "npm start", //how up starts the server
+    "timeout": 25, //timeout of AWS lambda function
+    "listen_timeout": 15,
+    "shutdown_timeout": 15
+  },
+  "environment": { // environmental variables are entered here so update it for your secret and prisma cluster. Apex Up Pro offers encrypted variables so you don't need to save it to Git
+    "NODE_ENV": "dev",
+    "PRISMA_STAGE": "dev",
+    "PRISMA_ENDPOINT": "https://eu1.prisma.sh/public-generated-name/name-of-prisma-server/dev",
+    "PRISMA_CLUSTER": "public-generated-name/prisma-eu1",
+    "PRISMA_SECRET": "mysecret123",
+    "APP_SECRET": "jwtsecret123"
+  },
+  "error_pages": { //if some one gets lost or goes to the wrong endpoint. An error page is displayed with mailto link
+    "variables": {
+      "support_email": "support@your-domain.com",
+      "color": "#2986e2"
+    }
+  },
+  "cors": { //setting up cors for your local client
+    "allowed_origins": ["http://localhost:3000"],
+    "allowed_methods": ["HEAD", "GET", "POST"],
+    "allowed_headers": ["*"]
+  }
+}
+```
+
+Create a `.upignore` file with the following. `up` reads `.gitignore` first then `.upignore`. Given that you're using Typescript you don't want ./dist to be saved to Git but `up` needs to deploy it to AWS Lambda to run your Javascript server. So `up` can negate `.gitignore` folders/files by adding an exclamation point to dist.
+
+```
+!dist
+```
+
+## Deploy and test your server
+
+Deploy your server
+
+```sh
+up
+```
+
+Test the server by opening up the playground in your browser. Double check the url in the playground matches the api domain i.e. my-aws-api-url.com/development
+
+```sh
+up url -o
+```
+

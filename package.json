@@ -1,11 +1,13 @@
 {
-  "name": "up-server-example",
+  "name": "up-graphql-yoga-server-example",
   "scripts": {
-    "start": "dotenv -- nodemon -e ts,graphql -x ts-node src/index.ts",
-    "dev": "npm-run-all --parallel start playground",
+    "local-start": "dotenv -- nodemon -e ts,graphql -x ts-node src/index.ts",
+    "dev": "npm-run-all --parallel local-start playground",
     "debug": "dotenv -- nodemon -e ts,graphql -x ts-node --inspect src/index.ts",
-    "playground": "graphql playground",
-    "build": "rimraf dist && tsc"
+    "playground": "graphql playground --port 5000",
+    "build": "rimraf dist && tsc",
+    "start": "node dist/index.js",
+    "local-start-js": "dotenv -- node dist/index.js"
   },
   "dependencies": {
     "bcryptjs": "2.4.3",

@@ -1,0 +1,33 @@
+{
+  "name": "name-of-server",
+  "profile": "name-of-newly-created-aws-profile",
+  "regions": ["eu-west-1"],
+  "lambda": {
+    "memory": 512
+  },
+  "proxy": {
+    "command": "npm start",
+    "timeout": 25,
+    "listen_timeout": 15,
+    "shutdown_timeout": 15
+  },
+  "environment": {
+    "NODE_ENV": "dev",
+    "PRISMA_STAGE": "dev",
+    "PRISMA_ENDPOINT": "https://eu1.prisma.sh/public-generated-name/name-of-prisma-server/dev",
+    "PRISMA_CLUSTER": "public-generated-name/prisma-eu1",
+    "PRISMA_SECRET": "mysecret123",
+    "APP_SECRET": "jwtsecret123"
+  },
+  "error_pages": {
+    "variables": {
+      "support_email": "support@your-domain.com",
+      "color": "#2986e2"
+    }
+  },
+  "cors": {
+    "allowed_origins": ["http://localhost:3000"],
+    "allowed_methods": ["HEAD", "GET", "POST"],
+    "allowed_headers": ["*"]
+  }
+}
