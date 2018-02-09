@@ -274,3 +274,8 @@ Test the server by opening up the playground in your browser. Double check the u
 up url -o
 ```
 
+Access your logs
+
+```sh
+up logs
+```
