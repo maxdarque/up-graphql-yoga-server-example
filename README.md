@@ -31,7 +31,7 @@ Use graphql-cli to create your project:
 graphql create up-graphql-yoga-server-example --boilerplate typescript-advanced
 ```
 
-As it creates the boilerplate project, it will ask you to choose where you'd like to deploy prisma. Select either prisma-eu1 or prisma-us1. In my case I chose, prisma-eu1 which is hosted in **eu-west-1**. This means I deployed my server to the same AWS region.
+As it creates the boilerplate project, it will ask you to choose where you'd like to deploy prisma. Select either `prisma-eu1` or `prisma-us1`. In my case I chose, `prisma-eu1` which is hosted in `eu-west-1`. This meant I deployed my server to the same AWS region.
 
 Navigate to the new project and check if the server starts
 ```sh
@@ -41,7 +41,7 @@ cd up-graphql-yoga-server-example
 yarn dev
 ```
 
-You will need to compile your Typescript into Javascript so it can run on AWS Lambda. Edit your tsconfig.json file to look lke this because AWS Lambda only supports Node.js v4.3.2 and 6.10.3 as of now (see [`currently supported runtimes`](https://docs.aws.amazon.com/lambda/latest/dg/current-supported-versions.html):
+You will need to compile your Typescript into Javascript so it can run on AWS Lambda. Edit your tsconfig.json file to look like. At time of writing, AWS Lambda only supports Node.js v4.3.2 and 6.10.3 (see [currently supported runtimes](https://docs.aws.amazon.com/lambda/latest/dg/current-supported-versions.html):
 
 ```json
 {
@@ -57,7 +57,7 @@ You will need to compile your Typescript into Javascript so it can run on AWS La
 }
 ```
 
-**Apex Up** references package.json and the `build` and `start` commands. So you will need to edit the script section of your package.json file so that `start` runs the compiled Javascript code.
+**Apex Up** references the `build` and `start` commands in package.json. So you will need to edit the script section of your package.json file so that `start` runs the compiled Javascript code.
 
 ```json
 "scripts": {
@@ -214,7 +214,7 @@ aws_secret_access_key = insert-key-here
 aws_access_key_id = insert-id-here
 ```
 
-Create an `up.json` file in the parent directory
+Create an `up.json` file in the parent directory. You might it easier to copy it from [`up.config`](./up.config)
 
 ```json
 {
@@ -252,7 +252,9 @@ Create an `up.json` file in the parent directory
 }
 ```
 
-Create a `.upignore` file with the following. `up` reads `.gitignore` first then `.upignore`. Given that you're using Typescript you don't want ./dist to be saved to Git but `up` needs to deploy it to AWS Lambda to run your Javascript server. So `up` can negate `.gitignore` folders/files by adding an exclamation point to dist.
+`up` reads `.gitignore` first then `.upignore`. Given that you're using Typescript you don't want ./dist to be saved to Git but `up` needs to deploy it to AWS Lambda to run your Javascript server. So `up` can negate declared `.gitignore` folders/files by adding an exclamation point to dist.
+
+Create a `.upignore` file with the following. 
 
 ```
 !dist
