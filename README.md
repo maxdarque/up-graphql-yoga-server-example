@@ -268,6 +268,8 @@ Deploy your server
 up
 ```
 
+**Note** You need to use `GraphQLServer` (not `graphqlLambda`)
+
 Test the server by opening up the playground in your browser. Double check the url in the playground matches the api domain i.e. my-aws-api-url.com/development
 
 ```sh
