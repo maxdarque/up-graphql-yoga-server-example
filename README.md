@@ -148,7 +148,7 @@ aws_access_key_id = insert-id-here
 
 Create an `up.json` file in the parent directory. You might it easier to copy it from [`up.json`](./up.json)
 
-```json
+```json5
 {
   "name": "name-of-server",
   "profile": "name-of-newly-created-aws-profile", // references your AWS credentials
