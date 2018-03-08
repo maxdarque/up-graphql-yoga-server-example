@@ -11,6 +11,13 @@
     "listen_timeout": 15,
     "shutdown_timeout": 15
   },
+  "stages": {
+    "development": {
+      "proxy": {
+        "command": "yarn dev"
+      }
+    }
+  },
   "environment": {
     "NODE_ENV": "dev",
     "PRISMA_STAGE": "dev",

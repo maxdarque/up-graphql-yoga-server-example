@@ -84,125 +84,57 @@ npm i -g up
 On AWS IAM, create a new policy as follows:
 ```json
 {
-  "Version": "2012-10-17",
-  "Statement": [
-    {
-      "Action": [
-        "route53:*",
-        "route53domains:*"
-      ],
-      "Effect": "Allow",
-      "Resource": "*"
-    },
-    {
-      "Action": [
-        "acm:*"
-      ],
-      "Effect": "Allow",
-      "Resource": "*"
-    },
-    {
-      "Action": [
-        "s3:*"
-      ],
-      "Effect": "Allow",
-      "Resource": "*"
-    },
-    {
-      "Action": [
-        "ssm:*"
-      ],
-      "Effect": "Allow",
-      "Resource": "*"
-    },
-    {
-      "Action": [
-        "cloudfront:*"
-      ],
-      "Effect": "Allow",
-      "Resource": "*"
-    },
-    {
-      "Action": [
-        "sns:*"
-      ],
-      "Effect": "Allow",
-      "Resource": "*"
-    },
-    {
-      "Action": [
-        "ssm:*"
-      ],
-      "Effect": "Allow",
-      "Resource": "*"
-    },
-    {
-      "Action": [
-        "cloudformation:Create*",
-        "cloudformation:Update*",
-        "cloudformation:Delete*",
-        "cloudformation:Describe*",
-        "cloudformation:ExecuteChangeSet"
-      ],
-      "Effect": "Allow",
-      "Resource": "*"
-    },
-    {
-      "Action": [
-        "iam:AttachRolePolicy",
-        "iam:CreatePolicy",
-        "iam:CreateRole",
-        "iam:DeleteRole",
-        "iam:DeleteRolePolicy",
-        "iam:GetRole",
-        "iam:PassRole",
-        "iam:PutRolePolicy"
-      ],
-      "Effect": "Allow",
-      "Resource": "*"
-    },
-    {
-      "Action": [
-        "lambda:Create*",
-        "lambda:Delete*",
-        "lambda:Get*",
-        "lambda:List*",
-        "lambda:Update*",
-        "lambda:AddPermission",
-        "lambda:RemovePermission",
-        "lambda:InvokeFunction"
-      ],
-      "Effect": "Allow",
-      "Resource": "*"
-    },
-    {
-      "Action": [
-        "logs:Create*",
-        "logs:Put*",
-        "logs:Test*",
-        "logs:Describe*",
-        "logs:FilterLogEvents"
-      ],
-      "Effect": "Allow",
-      "Resource": "*"
-    },
-    {
-      "Effect": "Allow",
-      "Action": [
-        "cloudwatch:*"
-      ],
-      "Resource": "*"
-    },
-    {
-      "Effect": "Allow",
-      "Action": [
-        "apigateway:*"
-      ],
-      "Resource": [
-        "arn:aws:apigateway:*::/*"
-      ]
-    }
-  ]
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Effect": "Allow",
+            "Action": [
+                "acm:*",
+                "cloudformation:Create*",
+                "cloudformation:Delete*",
+                "cloudformation:Describe*",
+                "cloudformation:ExecuteChangeSet",
+                "cloudformation:Update*",
+                "cloudfront:*",
+                "cloudwatch:*",
+                "ec2:*",
+                "ecs:*",
+                "events:*",
+                "iam:AttachRolePolicy",
+                "iam:CreatePolicy",
+                "iam:CreateRole",
+                "iam:DeleteRole",
+                "iam:DeleteRolePolicy",
+                "iam:GetRole",
+                "iam:PassRole",
+                "iam:PutRolePolicy",
+                "lambda:AddPermission",
+                "lambda:Create*",
+                "lambda:Delete*",
+                "lambda:Get*",
+                "lambda:InvokeFunction",
+                "lambda:List*",
+                "lambda:RemovePermission",
+                "lambda:Update*",
+                "logs:Create*",
+                "logs:Describe*",
+                "logs:FilterLogEvents",
+                "logs:Put*",
+                "logs:Test*",
+                "route53:*",
+                "route53domains:*",
+                "s3:*",
+                "ssm:*",
+                "sns:*"
+            ],
+            "Resource": "*"
+        },
+        {
+            "Effect": "Allow",
+            "Action": "apigateway:*",
+            "Resource": "arn:aws:apigateway:*::/*"
+        }
+    ]
 }
 ```
 
@@ -229,6 +161,13 @@ Create an `up.json` file in the parent directory. You might it easier to copy it
     "timeout": 25, //timeout of AWS lambda function
     "listen_timeout": 15,
     "shutdown_timeout": 15
+  },
+  "stages": {
+    "development": {
+      "proxy": {
+        "command": "yarn dev" //called by `up start` to launch dev server
+      }
+    }
   },
   "environment": { // environmental variables are entered here so update it for your secret and prisma cluster. Apex Up Pro offers encrypted variables so you don't need to save it to Git
     "NODE_ENV": "dev",
@@ -262,18 +201,37 @@ Create a `.upignore` file with the following.
 
 ## Deploy and test your server
 
-Deploy your server
+Run your server locally
+```sh
+up start
+```
+
+Deploy your server to staging
 
 ```sh
 up
 ```
 
+Deploy your server to staging
+
+```sh
+up deploy production
+```
+
 **Note** You need to use `GraphQLServer` (not `graphqlLambda`)
 
-Test the server by opening up the playground in your browser. Double check the url in the playground matches the api domain i.e. my-aws-api-url.com/development
+Test the server by opening up the playground in your browser. Double check the url in the playground matches the api domain i.e. my-aws-api-url.com/development.
+
+Open the staging endpoint using the `-o` flag.
 
 ```sh
 up url -o
+```
+
+To open your production server use:
+
+```sh
+up url -o production
 ```
 
 Access your logs
