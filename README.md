@@ -220,7 +220,9 @@ up deploy production
 
 **Note** You need to use `GraphQLServer` (not `graphqlLambda`)
 
-Test the server by opening up the playground in your browser. Double check the url in the playground matches the api domain i.e. my-aws-api-url.com/development.
+Test the server by opening up the playground in your browser. Double check the url in the playground matches the api domain i.e. my-aws-api-url.com/staging or my-aws-api-url.com/production.
+
+**Note** With Apex/Up 0.5 and up there is no api/development deployment. You run development locally and deploy to /staging and /production on AWS Lambda.
 
 Open the staging endpoint using the `-o` flag.
 
