@@ -2,6 +2,8 @@
 
 <br />
 
+**Update** - AWS Lambda recently released support for Node.js v8.10 which is amazing. The tutorial has been updated accordingly. 
+
 Please feel free to make suggested improvements and raise issues. I am relatively new to Typescript and GraphQL.
 
 ## What we will use
@@ -41,13 +43,13 @@ cd up-graphql-yoga-server-example
 yarn dev
 ```
 
-You will need to compile your Typescript into Javascript so it can run on AWS Lambda. Edit your tsconfig.json file to look like. At time of writing, AWS Lambda only supports Node.js v4.3.2 and 6.10.3 (see [currently supported runtimes](https://docs.aws.amazon.com/lambda/latest/dg/current-supported-versions.html):
+You will need to compile your Typescript into Javascript so it can run on AWS Lambda. Edit your tsconfig.json file to look like. AWS Lambda now supports Node.js v8.10 (see [currently supported runtimes](https://docs.aws.amazon.com/lambda/latest/dg/current-supported-versions.html):
 
 ```json
 {
   "compilerOptions": {
-    "target": "es6",
-    "lib": [ "es6", "dom", "esnext.asynciterable" ],
+    "target": "es2017",
+    "lib": [ "es2017", "dom", "esnext.asynciterable" ],
     "moduleResolution": "node",
     "module": "commonjs",
     "sourceMap": true,
@@ -154,7 +156,8 @@ Create an `up.json` file in the parent directory. You might it easier to copy it
   "profile": "name-of-newly-created-aws-profile", // references your AWS credentials
   "regions": ["eu-west-1"], // the region you wish to deploy to. Typically the same as your prisma deployment
   "lambda": {
-    "memory": 512 // how much memory you wish to allocate to lambda. For for details see Apex Up docs
+    "memory": 512, // how much memory you wish to allocate to lambda. For for details see Apex Up docs
+    "runtime": "nodejs8.10"
   },
   "proxy": {
     "command": "npm start", //how up starts the server

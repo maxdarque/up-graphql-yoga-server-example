@@ -3,7 +3,8 @@
   "profile": "name-of-newly-created-aws-profile",
   "regions": ["eu-west-1"],
   "lambda": {
-    "memory": 512
+    "memory": 512,
+    "runtime": "nodejs8.10"
   },
   "proxy": {
     "command": "npm start",
